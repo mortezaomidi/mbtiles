@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">mbtiles</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoibW9ydGV6YW9taWRpIiwiYSI6ImNqaG9xMzU5ejFhMDczMHMzemhtb2luc3EifQ.aY3C5hnGROlkYiU0CYk1YA</string>
+</resources>
