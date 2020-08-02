@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.mbtiles"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -35,4 +35,5 @@ dependencies {
 // my changes
 dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.3.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
