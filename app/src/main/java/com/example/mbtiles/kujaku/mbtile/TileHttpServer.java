@@ -1,4 +1,4 @@
-package com.example.mbtiles.mbtile;
+package com.example.mbtiles.kujaku.mbtile;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

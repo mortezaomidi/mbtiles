@@ -1,21 +1,30 @@
 package com.example.mbtiles;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.mbtiles.kujaku.mbtile.MBTilesHelper;
+import com.example.mbtiles.kujaku.mbtile.MBTilesLayer;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.io.File;
+
+import static com.example.mbtiles.kujaku.mbtile.MBTilesHelper.MB_TILES_DIRECTORY;
 
 
 /**
@@ -34,21 +43,18 @@ public class MainActivity extends AppCompatActivity {
         {
             if (checkPermission())
             {
-                // Code for above or equal 23 API Oriented Device
-                // Your Permission granted already .Do next code
+                Toast.makeText(this, "Build.VERSION.SDK_INT >= 23", Toast.LENGTH_LONG);
+
             } else {
-                requestPermission(); // Code for permission
+                requestPermission();
             }
         }
         else
         {
 
-            // Code for Below 23 API Oriented Device
-            // Do next code
+
         }
 
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
 
         // This contains the MapView in XML and needs to be called after the access token is configured.
@@ -58,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                mapboxMap.setStyle(Style.SATELLITE, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
 
-                    // Map is set up and the style has loaded. Now you can add data or make other map adjustments.
+                        addMbtiles(mapboxMap);
 
                     }
                 });
@@ -72,20 +78,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (result == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "PERMISSION granted", Toast.LENGTH_LONG).show();
             return true;
         } else {
+            Toast.makeText(this, "PERMISSION is Not Granted", Toast.LENGTH_LONG).show();
             return false;
         }
     }
 
+    private void addMbtiles(MapboxMap mapboxMap) {
+        File mbtilesFile = new File("/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles");
+        if (!mbtilesFile.exists()) {
+            Toast.makeText(this, "mbtilesFile mot exist", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "mbtilesFile is exist", Toast.LENGTH_LONG).show();
+            // I dont no why mbtilesFile.canRead() returns false
+            Log.d("MyErr",    "can read=" + mbtilesFile.canRead());
+            // can read=false whhy?
+
+            //MBTilesHelper mbTilesHelper = new MBTilesHelper();
+            //MBTilesLayer mbTilesLayer = new MBTilesLayer(this, mbtilesFile, mbTilesHelper);
+            //mbTilesLayer.addLayerToMap(mapboxMap);
+        }
+
+    }
+
     private void requestPermission() {
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Toast.makeText(MainActivity.this, "External Storage permission allows us to do read mbtiles. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
         } else {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         }
     }
 
