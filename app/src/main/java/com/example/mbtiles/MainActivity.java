@@ -4,18 +4,16 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.mbtiles.kujaku.mbtile.MBTilesHelper;
-import com.example.mbtiles.kujaku.mbtile.MBTilesLayer;
+
+
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.style.layers.Layer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +22,6 @@ import androidx.core.content.ContextCompat;
 
 import java.io.File;
 
-import static com.example.mbtiles.kujaku.mbtile.MBTilesHelper.MB_TILES_DIRECTORY;
 
 
 /**
@@ -68,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 mapboxMap.setStyle(Style.SATELLITE, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
-
+                        Mapbox.setConnected(true);
                         addMbtiles(mapboxMap);
 
                     }
@@ -101,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
             //MBTilesHelper mbTilesHelper = new MBTilesHelper();
             //MBTilesLayer mbTilesLayer = new MBTilesLayer(this, mbtilesFile, mbTilesHelper);
             //mbTilesLayer.addLayerToMap(mapboxMap);
+
+            String filePath = "/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles";
+            String sourceId = "ID";
+
+
         }
 
     }

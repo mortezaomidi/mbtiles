@@ -36,4 +36,8 @@ dependencies {
 dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.3.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    implementation "org.jetbrains.anko:anko:$anko_version"
+    // Anko SQLite
+    implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
 }
