@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +62,14 @@ public class MainActivity extends AppCompatActivity {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                MainActivity.this.mapboxMap = mapboxMap;
                 mapboxMap.setStyle(Style.SATELLITE, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Connect to localhost even when device is not connected to internet
                         Mapbox.setConnected(true);
                         addMbtiles(style);
+
 
                     }
                 });
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addMbtiles(Style style) {
-        File mbtilesFile = new File("/sdcard/mbtiles/countries-raster.mbtiles");
+        File mbtilesFile = new File("/sdcard/mbtiles/2017-07-03_iran_tehran.mbtiles");
         String sourceId = "your-mb-id";
         MBTilesSource mbSource;
         try {
@@ -96,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
                     mbSource.getUrl()), 256)); // 256 * 256 for raster tiles
             RasterLayer rasterLayer = new RasterLayer("raster_layer_id", mbSource.getId());
             style.addLayer(rasterLayer);
+            // if mbSource contains vector tiles
+            mapboxMap.setStyle(new Style.Builder().fromUri("asset://mbStyle.json"));
+
+
 
         } catch (MBTilesSourceError.CouldNotReadFileError e) {
             Log.e("MyErr", "CouldNotReadFileError");
