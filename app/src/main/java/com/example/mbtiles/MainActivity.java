@@ -14,6 +14,9 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.RasterLayer;
+import com.mapbox.mapboxsdk.style.sources.RasterSource;
+import com.mapbox.mapboxsdk.style.sources.TileSet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         Mapbox.setConnected(true);
-                        addMbtiles(mapboxMap);
+                        addMbtiles(style);
 
                     }
                 });
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addMbtiles(MapboxMap mapboxMap) {
+    private void addMbtiles(Style style) {
         File mbtilesFile = new File("/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles");
         if (!mbtilesFile.exists()) {
             Toast.makeText(this, "mbtilesFile mot exist", Toast.LENGTH_LONG).show();
@@ -101,8 +104,23 @@ public class MainActivity extends AppCompatActivity {
 
             String filePath = "/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles";
             String sourceId = "ID";
+            // Connect to localhost even when device is not connected to internet
 
+            Mapbox.setConnected(true);
+            MBTilesSource mbSource;
+            try {
+                mbSource = new MBTilesSource(
+                        String.format("file://%s", filePath),
+                        sourceId
+                );
+                mbSource.activate();
+                style.addSource(new RasterSource(mbSource.getId(), new TileSet(null, mbSource.getUrl()), 126));
+                RasterLayer rasterLayer = new RasterLayer("raster_layer_id", mbSource.getId());
+                style.addLayer(rasterLayer);
 
+            } catch (MBTilesSourceError.CouldNotReadFileError e){
+                // Deal with error here
+            }
         }
 
     }
