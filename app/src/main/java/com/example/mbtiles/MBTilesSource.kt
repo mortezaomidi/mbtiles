@@ -27,7 +27,7 @@ class MBTilesSource(filePath: String, id: String? = null) {
     var id = id ?: filePath.substringAfterLast("/").substringBefore(".")
     val url get() = "http://localhost:${MBTilesServer.port}/$id/{z}/{x}/{y}.$format"
     private val db: SQLiteDatabase = try {
-        SQLiteDatabase.openOrCreateDatabase(filePath, null)
+        SQLiteDatabase.openDatabase(filePath, null, SQLiteDatabase.OPEN_READONLY)
     } catch (e: RuntimeException) {
         throw MBTilesSourceError.CouldNotReadFileError()
     }

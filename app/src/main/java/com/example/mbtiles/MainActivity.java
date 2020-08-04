@@ -39,18 +39,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= 23)
-        {
-            if (checkPermission())
-            {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkPermission()) {
                 Toast.makeText(this, "Build.VERSION.SDK_INT >= 23", Toast.LENGTH_LONG);
 
             } else {
                 requestPermission();
             }
-        }
-        else
-        {
+        } else {
 
 
         }
@@ -68,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 mapboxMap.setStyle(Style.SATELLITE, new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
+                        // Connect to localhost even when device is not connected to internet
                         Mapbox.setConnected(true);
                         addMbtiles(style);
 
@@ -89,40 +86,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addMbtiles(Style style) {
-        File mbtilesFile = new File("/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles");
-        if (!mbtilesFile.exists()) {
-            Toast.makeText(this, "mbtilesFile mot exist", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "mbtilesFile is exist", Toast.LENGTH_LONG).show();
-            // I dont no why mbtilesFile.canRead() returns false
-            Log.d("MyErr",    "can read=" + mbtilesFile.canRead());
-            // can read=false whhy?
+        File mbtilesFile = new File("/sdcard/mbtiles/countries-raster.mbtiles");
+        String sourceId = "your-mb-id";
+        MBTilesSource mbSource;
+        try {
+            mbSource = new MBTilesSource(mbtilesFile.getAbsolutePath(), sourceId);
+            mbSource.activate();
+            style.addSource(new RasterSource(mbSource.getId(), new TileSet(null,
+                    mbSource.getUrl()), 256)); // 256 * 256 for raster tiles
+            RasterLayer rasterLayer = new RasterLayer("raster_layer_id", mbSource.getId());
+            style.addLayer(rasterLayer);
 
-            //MBTilesHelper mbTilesHelper = new MBTilesHelper();
-            //MBTilesLayer mbTilesLayer = new MBTilesLayer(this, mbtilesFile, mbTilesHelper);
-            //mbTilesLayer.addLayerToMap(mapboxMap);
-
-            String filePath = "/sdcard/01-NGO_GIS/mbtiles/resources/raster.mbtiles";
-            String sourceId = "ID";
-            // Connect to localhost even when device is not connected to internet
-
-            Mapbox.setConnected(true);
-            MBTilesSource mbSource;
-            try {
-                mbSource = new MBTilesSource(
-                        String.format("file://%s", filePath),
-                        sourceId
-                );
-                mbSource.activate();
-                style.addSource(new RasterSource(mbSource.getId(), new TileSet(null, mbSource.getUrl()), 126));
-                RasterLayer rasterLayer = new RasterLayer("raster_layer_id", mbSource.getId());
-                style.addLayer(rasterLayer);
-
-            } catch (MBTilesSourceError.CouldNotReadFileError e){
-                // Deal with error here
-            }
+        } catch (MBTilesSourceError.CouldNotReadFileError e) {
+            Log.e("MyErr", "CouldNotReadFileError");
+            // Deal with error here
         }
-
     }
 
     private void requestPermission() {
@@ -130,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Toast.makeText(MainActivity.this, "External Storage permission allows us to do read mbtiles. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
         } else {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+            }, PERMISSION_REQUEST_CODE);
         }
     }
 
